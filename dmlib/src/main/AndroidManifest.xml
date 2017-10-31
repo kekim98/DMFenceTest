@@ -11,6 +11,9 @@
             android:value="@integer/google_play_services_version"/>
 
         <service android:name=".DMService" />
+        <service
+            android:name=".GeofenceTransitionsIntentService"
+            android:exported="false" />
 
     </application>
 
