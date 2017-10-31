@@ -32,7 +32,7 @@ final class Constants {
     private Constants() {
     }
 
-    private static final String PACKAGE_NAME = "com.google.android.gms.location.SimpleGeofence";
+    private static final String PACKAGE_NAME = "com.bawoori.dmlib";
 
     static final String GEOFENCES_ADDED_KEY = PACKAGE_NAME + ".GEOFENCES_ADDED_KEY";
 

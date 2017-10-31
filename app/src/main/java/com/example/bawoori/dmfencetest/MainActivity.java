@@ -13,21 +13,24 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
-import locationCheckModule.LocationCheckService;
+import com.bawoori.dmlib.DMService;
+
+
 
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = MainActivity.class.getSimpleName();
-    LocationCheckService mService;
+    DMService mService;
     boolean mBound = false;
 
     private ArrayAdapter adapter;
 
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        // Bind to LocationCheckService
-        Intent intent = new Intent(this, LocationCheckService.class);
+        // Bind to DMService
+        Intent intent = new Intent(this, DMService.class);
         bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
 
         setContentView(R.layout.activity_main);
@@ -45,18 +48,21 @@ public class MainActivity extends AppCompatActivity {
                 String strText = (String) parent.getItemAtPosition(position) ;
                 Log.d(TAG, "selected item:" + strText);
 
-                Intent intent=new Intent(MainActivity.this, CheckActivity.class);
-                intent.putExtra("DEVICE_ID", strText);
+                Intent intent=new Intent(MainActivity.this, FenceInfoActivity.class);
+                intent.putExtra("FENCE_ID", strText);
                 startActivity(intent);
             }
         }) ;
+
+
     }
 
     @Override
     protected void onStart() {
         super.onStart();
-        // Bind to LocationCheckService
-//        Intent intent = new Intent(this, LocationCheckService.class);
+
+        // Bind to DMService
+//        Intent intent = new Intent(this, DMService.class);
 //        bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
     }
 
@@ -85,8 +91,8 @@ public class MainActivity extends AppCompatActivity {
 
     /** Called when a button is clicked (the button in the layout file attaches to
      * this method with the android:onClick attribute) */
-    public void onAddDevice(View v) {
-        Intent intent=new Intent(this, RegDeviceActivity.class);
+    public void onAddFence(View v) {
+        Intent intent=new Intent(this, RegFenceActivity.class);
         startActivity(intent);
     }
 
@@ -97,13 +103,13 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public void onServiceConnected(ComponentName className,
                                        IBinder service) {
-            // We've bound to LocationCheckService, cast the IBinder and get LocationCheckService instance
+            // We've bound to DMService, cast the IBinder and get DMService instance
            if(!mBound) {
-               LocationCheckService.LocalBinder binder = (LocationCheckService.LocalBinder) service;
+               DMService.LocalBinder binder = (DMService.LocalBinder) service;
                mService = binder.getService();
                mBound = true;
 
-               mService.initService();
+               mService.initDMLib();
                refresh();
                Log.d(TAG, "ServiceConnected-mBound:" + mBound);
            }
@@ -119,10 +125,10 @@ public class MainActivity extends AppCompatActivity {
 
     private void refresh(){
         if(mBound){
-            String[] devices = mService.getAllDevice();
+            String[] fences = mService.getAllFences();
             adapter.clear();
-            for(int i=0; i<devices.length; i++){
-                adapter.add(devices[i]);
+            for(int i=0; i<fences.length; i++){
+                adapter.add(fences[i]);
             }
             adapter.notifyDataSetChanged();
             Log.d(TAG, "refresh().................................");

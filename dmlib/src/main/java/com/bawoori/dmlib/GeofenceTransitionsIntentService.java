@@ -19,6 +19,7 @@ package com.bawoori.dmlib;
 import android.app.IntentService;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.BitmapFactory;
@@ -120,16 +121,23 @@ public class GeofenceTransitionsIntentService extends IntentService {
      * If the user clicks the notification, control goes to the MainActivity.
      */
     private void sendNotification(String notificationDetails) {
+
+
+        ComponentName cn = new ComponentName("com.example.bawoori.dmfencetest",
+                "com.example.bawoori.dmfencetest.MainActivity");
+
         // Create an explicit content Intent that starts the main Activity.
         //Intent notificationIntent = new Intent(getApplicationContext(), MainActivity.class);
-        Intent notificationIntent = new Intent();
-        notificationIntent.setClassName(getApplicationContext(), "com.example.bawoori.dmfencetest.MainActivity");
+        Intent notificationIntent = new Intent(getApplicationContext(), cn.getClass());
+       /* Intent notificationIntent = new Intent();
+        notificationIntent.setClassName(getApplicationContext(), "com.example.bawoori.dmfencetest.MainActivity");*/
 
         // Construct a task stack.
         TaskStackBuilder stackBuilder = TaskStackBuilder.create(this);
 
         // Add the main Activity to the task stack as the parent.
        // stackBuilder.addParentStack(MainActivity.class);
+        stackBuilder.addParentStack(cn.getClass());
 
         // Push the content Intent onto the stack.
         stackBuilder.addNextIntent(notificationIntent);

@@ -24,7 +24,7 @@
         android:id="@+id/addDevice"
         android:layout_width="368dp"
         android:layout_height="wrap_content"
-        android:onClick="onAddDevice"
+        android:onClick="onAddFence"
         app:layout_constraintBottom_toTopOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"

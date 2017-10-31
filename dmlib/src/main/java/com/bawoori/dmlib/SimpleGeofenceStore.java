@@ -18,7 +18,15 @@ package com.bawoori.dmlib;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.util.Log;
 
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import static com.bawoori.dmlib.Constants.INVALID_FLOAT_VALUE;
 import static com.bawoori.dmlib.Constants.INVALID_INT_VALUE;
@@ -41,6 +49,7 @@ public class SimpleGeofenceStore {
     private final SharedPreferences mPrefs;
     // The name of the SharedPreferences.
     private static final String SHARED_PREFERENCES = "SharedPreferences";
+    private static final String TAG =SimpleGeofenceStore.class.getSimpleName() ;
 
     /**
      * Create the SharedPreferences storage with private access only.
@@ -98,6 +107,36 @@ public class SimpleGeofenceStore {
                 geofence.getTransitionType());
         // Commit the changes.
         prefs.commit();
+    }
+
+    public  List<String> getAllFenceIDs(){
+
+        List<String> ret= new ArrayList<String>();
+        Set<String> tempResult = new HashSet<String>();
+
+        Pattern pattern = Pattern.compile(KEY_PREFIX + "_([^_]*)_*");
+        SharedPreferences prefs = mPrefs;
+        Map<String, ?> allEntries = prefs.getAll();
+        for (Map.Entry<String, ?> entry : allEntries.entrySet()) {
+            Log.d(TAG, entry.getKey() + ": " + entry.getValue().toString());
+            String fullKey = entry.getKey();
+            Matcher matcher = pattern.matcher(fullKey);
+
+            while (matcher.find()) {
+                Log.d(TAG, "getAllFenceIDs: id=" + matcher.group(1));
+                String id = matcher.group(1);
+                if (!id.equals("TRANSITION") && !id.equals("EXPIRATION") && !id.equals("LONGITUDE") && !id.equals("LATITUDE") && !id.equals("RADIUS")) {
+                    Log.d(TAG, "strip: id=" + id);
+                    tempResult.add(id);
+                }
+                //ret.setCID(matcher.group(1));
+            }
+
+
+            //ret.add(entry.getKey());
+        }
+        ret.addAll(tempResult);
+        return ret;
     }
 
     /**

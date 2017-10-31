@@ -9,28 +9,30 @@ import android.os.IBinder;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import locationCheckModule.CheckInfo;
-import locationCheckModule.LocationCheckService;
+import com.bawoori.dmlib.DMInfo;
+import com.bawoori.dmlib.DMService;
 
-public class CheckActivity extends AppCompatActivity {
-    private static final String TAG = CheckActivity.class.getSimpleName();
+import java.util.Locale;
+
+
+public class FenceInfoActivity extends AppCompatActivity {
+    private static final String TAG = FenceInfoActivity.class.getSimpleName();
     private static final String CHK_SUCCESS_MSG = "GeoFence 정보.";
    // private static final String CHK_FAIL_MSG = "서비스가 정상 완료되지 못하였습니다.";
-    LocationCheckService mService;
+    DMService mService;
     boolean mBound = false;
-    static String device_id = "";
+    static String FENCE_ID = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_check);
-        setTitle("GeoFence Info 화면");
+        setContentView(R.layout.activity_info);
+        setTitle("GeoFence Info");
 
-        // Bind to LocationCheckService
-        Intent intent = new Intent(this, LocationCheckService.class);
+        // Bind to DMService
+        Intent intent = new Intent(this, DMService.class);
         bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
     }
 
@@ -63,9 +65,9 @@ public class CheckActivity extends AppCompatActivity {
     /** Called when a button is clicked (the button in the layout file attaches to
      * this method with the android:onClick attribute) */
     public void onReAddDevice(View v) {
-        Log.d(TAG, "device_id:" + device_id);
-        Intent intent=new Intent(this, AddDeviceActivity.class);
-        intent.putExtra("DEVICE_ID", device_id);
+        Log.d(TAG, "FENCE_ID:" + FENCE_ID);
+        Intent intent=new Intent(this, AddFenceActivity.class);
+        intent.putExtra("FENCE_ID", FENCE_ID);
         startActivity(intent);
         finish();
     }
@@ -79,36 +81,46 @@ public class CheckActivity extends AppCompatActivity {
         @Override
         public void onServiceConnected(ComponentName className,
                                        IBinder service) {
-            // We've bound to LocationCheckService, cast the IBinder and get LocationCheckService instance
+            // We've bound to DMService, cast the IBinder and get DMService instance
             if(!mBound) {
-                LocationCheckService.LocalBinder binder = (LocationCheckService.LocalBinder) service;
+                DMService.LocalBinder binder = (DMService.LocalBinder) service;
                 mService = binder.getService();
                 mBound = true;
 
                 Bundle extras = getIntent().getExtras();
+                DMInfo dmInfo = null;
 
                 if (extras != null) {
-                    device_id = extras.getString("DEVICE_ID");
+                    FENCE_ID = extras.getString("FENCE_ID");
+                    dmInfo = mService.getFence(FENCE_ID);
                     //The key argument here must match that used in the other activity
                 }
-                CheckInfo checkInfo = mService.checkServiceDone(device_id);
-                int result = checkInfo.getResult();
 
-                TextView deviceIfo = (TextView) findViewById(R.id.deviceInfo);
-                deviceIfo.setText(checkInfo.getRegInfo() + "\n\n" + checkInfo.getCurrInfo() + "\n\n" +checkInfo.getDistance());
+                if (dmInfo != null) {
+                    TextView fence_id = (TextView) findViewById(R.id.fence_id);
+                    TextView latitude = (TextView) findViewById(R.id.latitude);
+                    TextView longitude = (TextView) findViewById(R.id.longitude);
+                    TextView radius = (TextView) findViewById(R.id.radius);
+                    TextView transition_type = (TextView) findViewById(R.id.transition_type);
 
-               /* if(result == 0){
-                    TextView textView1 = (TextView) findViewById(R.id.checkResultMsg) ;
-                    String msg = "[" + device_id + "] " + CHK_SUCCESS_MSG;
-                    textView1.setText(msg) ;
-                }else{
-                    TextView textView1 = (TextView) findViewById(R.id.checkResultMsg) ;
-                    String msg = "[" + device_id + "] " + CHK_FAIL_MSG;
-                    textView1.setText(msg) ;
+                    fence_id.setText(String.format(Locale.ENGLISH, "%s: %s",
+                            "ID",
+                            dmInfo.getId()));
+                    latitude.setText(String.format(Locale.ENGLISH, "%s: %f",
+                            "LATITUDE",
+                            dmInfo.getLatitude()));
+                    longitude.setText(String.format(Locale.ENGLISH, "%s: %f",
+                            "LONGITUDE",
+                            dmInfo.getLongitude()));
+                    radius.setText(String.format(Locale.ENGLISH, "%s: %f",
+                            "RADIUS",
+                            dmInfo.getRadius()));
+                    transition_type.setText(String.format(Locale.ENGLISH, "%s: %d",
+                            "TRANSITION_TYPE",
+                            dmInfo.getType()));
 
-                    LinearLayout linearLayout = (LinearLayout)findViewById(R.id.reRegLayout);
-                    linearLayout.setVisibility(View.VISIBLE);
-                }*/
+                }
+
 
                 Log.d(TAG, "ServiceConnected.................................");
             }

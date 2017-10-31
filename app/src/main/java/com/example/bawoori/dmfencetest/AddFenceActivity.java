@@ -10,16 +10,19 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.widget.TextView;
 
-import locationCheckModule.LocationCheckService;
-import locationCheckModule._Location;
+import com.bawoori.dmlib.DMInfo;
+import com.bawoori.dmlib.DMService;
 
-public class AddDeviceActivity extends AppCompatActivity {
+import java.util.Locale;
 
-    private static final String TAG = AddDeviceActivity.class.getSimpleName();
+
+public class AddFenceActivity extends AppCompatActivity {
+
+    private static final String TAG = AddFenceActivity.class.getSimpleName();
     private static final String ADD_SUCCESS_MSG = "정상 등록 되었습니다.";
     private static final String ADD_FAIL_MSG = "이미 등록된 Geofences가 있습니다.";
 
-    LocationCheckService mService;
+    DMService mService;
     boolean mBound = false;
 
     @Override
@@ -28,8 +31,8 @@ public class AddDeviceActivity extends AppCompatActivity {
         setContentView(R.layout.activity_add_device);
         setTitle("등록 결과 화면");
 
-        // Bind to LocationCheckService
-        Intent intent = new Intent(this, LocationCheckService.class);
+        // Bind to DMService
+        Intent intent = new Intent(this, DMService.class);
         bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
     }
 
@@ -61,34 +64,42 @@ public class AddDeviceActivity extends AppCompatActivity {
     }
 
     /** Defines callbacks for service binding, passed to bindService() */
-    private ServiceConnection mConnection = new ServiceConnection() {
+    public ServiceConnection mConnection = new ServiceConnection() {
 
         @Override
         public void onServiceConnected(ComponentName className,
                                        IBinder service) {
-            // We've bound to LocationCheckService, cast the IBinder and get LocationCheckService instance
+            // We've bound to DMService, cast the IBinder and get DMService instance
             if(!mBound) {
-                LocationCheckService.LocalBinder binder = (LocationCheckService.LocalBinder) service;
+                DMService.LocalBinder binder = (DMService.LocalBinder) service;
                 mService = binder.getService();
                 mBound = true;
 
                 Bundle extras = getIntent().getExtras();
-                int result = -1;
-                _Location lo =null;
-                String device_id="";
+                boolean result = false;
+                DMInfo dmInfo = new DMInfo();
+                
+                String geofence_id="";
                 if(extras != null){
-                    device_id = extras.getString("DEVICE_ID");
-                    lo = mService.updateDevice(device_id);
-                    result = 0; // always return true
-                }else {
-                    result = mService.addDevice(LocationCheckService.DEFAULT_ID);
+                    geofence_id = extras.getString("FENCE_ID");
+                    DMTestApplication application = (DMTestApplication)getApplicationContext();
+                    Double latitude = application.getLatitude();
+                    Double longitue = application.getLongitude();
+
+                    dmInfo.setId(geofence_id);
+                    dmInfo.setLatitude(latitude);
+                    dmInfo.setLongitude(longitue);
+
+                    Log.d(TAG, "onServiceConnected: latitude=" + String.valueOf(latitude));
+                    result = mService.addFence(dmInfo);
                 }
-                if(result == 0){
+
+                if(result){
                     TextView textView1 = (TextView) findViewById(R.id.addResultMsg) ;
                     textView1.setText(ADD_SUCCESS_MSG) ;
 
                     TextView id = (TextView) findViewById(R.id.VID);
-                    id.setText(device_id);
+                    id.setText(geofence_id);
 
                    /* TextView CELLID = (TextView) findViewById(R.id.VCELLID);
                     CELLID.setText(lo.getCID());
@@ -100,10 +111,10 @@ public class AddDeviceActivity extends AppCompatActivity {
                     ADDR2.setText(lo.getADDR2());*/
 
                     TextView LAT = (TextView) findViewById(R.id.VLAT);
-                    LAT.setText(lo.getLAT());
+                    LAT.setText(String.format(Locale.ENGLISH, "%f", dmInfo.getLatitude()));
 
                     TextView LNG = (TextView) findViewById(R.id.VLNG);
-                    LNG.setText(lo.getLNG());
+                    LNG.setText(String.format(Locale.ENGLISH, "%f", dmInfo.getLongitude()));
 
 
                 }else{

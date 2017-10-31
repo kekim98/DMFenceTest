@@ -8,7 +8,6 @@ import android.os.IBinder;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.util.Log;
-import android.view.View;
 import android.widget.Toast;
 
 import com.google.android.gms.location.Geofence;
@@ -18,7 +17,11 @@ import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 
+import java.util.ArrayList;
 import java.util.List;
+
+import static com.bawoori.dmlib.Constants.ANDROID_BUILDING_RADIUS_METERS;
+import static com.bawoori.dmlib.Constants.GEOFENCE_EXPIRATION_TIME;
 
 public class DMService extends Service implements OnCompleteListener<Void> {
     private static final String TAG = DMService.class.getSimpleName();
@@ -31,16 +34,17 @@ public class DMService extends Service implements OnCompleteListener<Void> {
     private SimpleGeofenceStore mGeofenceStorage;
     private PendingIntent mGeofencePendingIntent;
     private List<Geofence> mGeofenceList;
-    private PendingGeofenceTask mPendingGeofenceTask = PendingGeofenceTask.NONE;
+  //  private PendingGeofenceTask mPendingGeofenceTask = PendingGeofenceTask.NONE;
 
     @Override
     public void onComplete(@NonNull Task<Void> task) {
-        mPendingGeofenceTask = PendingGeofenceTask.NONE;
+  //      mPendingGeofenceTask = PendingGeofenceTask.NONE;
         if (task.isSuccessful()) {
             updateGeofencesAdded(!getGeofencesAdded());
 
-            int messageId = getGeofencesAdded() ? R.string.geofences_added :
-                    R.string.geofences_removed;
+           /* int messageId = getGeofencesAdded() ? R.string.geofences_added :
+                    R.string.geofences_removed;*/
+            int messageId = R.string.geofences_added;
             Toast.makeText(this, getString(messageId), Toast.LENGTH_SHORT).show();
         } else {
             // Get the status code for the error and log it using a user-friendly message.
@@ -60,6 +64,10 @@ public class DMService extends Service implements OnCompleteListener<Void> {
 
     @Override
     public IBinder onBind(Intent intent) {
+        mGeofenceStorage = new SimpleGeofenceStore(this);
+        mGeofenceList = new ArrayList<>();
+        mGeofencingClient = LocationServices.getGeofencingClient(this);
+
         return mBinder;
     }
 
@@ -138,10 +146,59 @@ public class DMService extends Service implements OnCompleteListener<Void> {
         return builder.build();
     }
 
-    public void initDMLib() {
-        mGeofencingClient = LocationServices.getGeofencingClient(this);
-        mGeofenceStorage = new SimpleGeofenceStore(this);
 
+
+    public void initDMLib() {
+        /*mGeofencingClient = LocationServices.getGeofencingClient(this);
+        mGeofenceStorage = new SimpleGeofenceStore(this);
+        mGeofenceList = new ArrayList<>();*/
+
+    }
+
+    public String[] getAllFences() {
+        List<String> fences = mGeofenceStorage.getAllFenceIDs();
+
+        return fences.toArray(new String[fences.size()]);
+    }
+
+
+    public boolean isValidID(String id){
+        return mGeofenceStorage.getGeofence(id)==null?true:false;
+    }
+
+    public boolean addFence(DMInfo info) {
+
+      //  removeGeofences();
+
+        String id = info.getId();
+        Double latitude = info.getLatitude();
+        Double longitue = info.getLongitude();
+
+        SimpleGeofence geofence = new SimpleGeofence(id, latitude, longitue,
+                ANDROID_BUILDING_RADIUS_METERS,
+                GEOFENCE_EXPIRATION_TIME,
+                Geofence.GEOFENCE_TRANSITION_ENTER | Geofence.GEOFENCE_TRANSITION_EXIT);
+
+        mGeofenceStorage.setGeofence(id, geofence);
+        mGeofenceList.add(geofence.toGeofence());
+
+        addGeofences();
+
+        return true;
+    }
+
+    public DMInfo getFence(String id) {
+
+        DMInfo result = new DMInfo();
+        SimpleGeofence geofence = mGeofenceStorage.getGeofence(id);
+
+        result.setId(geofence.getId());
+        result.setLatitude(geofence.getLatitude());
+        result.setLongitude(geofence.getLatitude());
+        result.setRadius(geofence.getRadius());
+        result.setType(geofence.getTransitionType());
+
+        return result;
     }
 
 }

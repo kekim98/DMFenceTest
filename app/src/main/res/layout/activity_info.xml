@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".CheckActivity">
+    tools:context=".FenceInfoActivity">
 
     <LinearLayout
         android:layout_width="0dp"
@@ -22,25 +22,57 @@
         tools:layout_constraintTop_creator="1">
 
         <TextView
-            android:id="@+id/checkResultMsg"
+            android:id="@+id/fence_id"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_margin="20dp"
+            android:gravity="start"
             android:text="TextView"
             android:textAlignment="center"
-            android:textSize="18sp"
+            android:textSize="24sp"
             android:textStyle="bold"
             tools:ignore="HardcodedText,MissingConstraints"
             tools:layout_editor_absoluteX="163dp"
             tools:layout_editor_absoluteY="94dp" />
 
         <TextView
-            android:id="@+id/deviceInfo"
+            android:id="@+id/latitude"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_margin="10dp"
+            android:gravity="start"
             android:text="TextView"
-            android:textAlignment="center"
+            android:textAlignment="viewStart"
+            tools:ignore="HardcodedText" />
+
+        <TextView
+            android:id="@+id/longitude"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="10dp"
+            android:gravity="start"
+            android:text="TextView"
+            android:textAlignment="viewStart"
+            tools:ignore="HardcodedText" />
+
+        <TextView
+            android:id="@+id/radius"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="10dp"
+            android:gravity="start"
+            android:text="TextView"
+            android:textAlignment="viewStart"
+            tools:ignore="HardcodedText" />
+
+        <TextView
+            android:id="@+id/transition_type"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="10dp"
+            android:gravity="start"
+            android:text="TextView"
+            android:textAlignment="viewStart"
             tools:ignore="HardcodedText" />
 
     </LinearLayout>

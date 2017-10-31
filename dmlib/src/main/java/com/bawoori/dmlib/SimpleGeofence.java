@@ -16,8 +16,6 @@
 
 package com.bawoori.dmlib;
 
-import com.google.android.gms.location.Geofence;
-
 /**
  * A single SimpleGeofence object, defined by its center and radius.
  */
