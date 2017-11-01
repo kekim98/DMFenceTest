@@ -118,15 +118,15 @@ public class SimpleGeofenceStore {
         SharedPreferences prefs = mPrefs;
         Map<String, ?> allEntries = prefs.getAll();
         for (Map.Entry<String, ?> entry : allEntries.entrySet()) {
-            Log.d(TAG, entry.getKey() + ": " + entry.getValue().toString());
+          //  Log.d(TAG, entry.getKey() + ": " + entry.getValue().toString());
             String fullKey = entry.getKey();
             Matcher matcher = pattern.matcher(fullKey);
 
             while (matcher.find()) {
-                Log.d(TAG, "getAllFenceIDs: id=" + matcher.group(1));
+             //   Log.d(TAG, "getAllFenceIDs: id=" + matcher.group(1));
                 String id = matcher.group(1);
                 if (!id.equals("TRANSITION") && !id.equals("EXPIRATION") && !id.equals("LONGITUDE") && !id.equals("LATITUDE") && !id.equals("RADIUS")) {
-                    Log.d(TAG, "strip: id=" + id);
+               //     Log.d(TAG, "strip: id=" + id);
                     tempResult.add(id);
                 }
                 //ret.setCID(matcher.group(1));

@@ -1,8 +1,11 @@
 package com.example.bawoori.dmfencetest;
 
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.ServiceConnection;
 import android.os.Bundle;
+import android.os.IBinder;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
@@ -24,8 +27,8 @@ public class RegFenceActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         // Bind to DMService
-        /*Intent intent = new Intent(this, DMService.class);
-        bindService(intent, mConnection, Context.BIND_AUTO_CREATE);*/
+        Intent intent = new Intent(this, DMService.class);
+        bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
 
         setContentView(R.layout.activity_reg_device);
         setTitle("등록 화면");
@@ -61,10 +64,10 @@ public class RegFenceActivity extends AppCompatActivity {
     protected void onDestroy() {
         super.onDestroy();
         // Unbind from the service
-       /* if (mBound) {
+        if (mBound) {
             unbindService(mConnection);
             mBound = false;
-        }*/
+        }
 
     }
 
@@ -103,7 +106,7 @@ public class RegFenceActivity extends AppCompatActivity {
     /**
      * Defines callbacks for service binding, passed to bindService()
      */
-   /* private ServiceConnection mConnection = new ServiceConnection() {
+    private ServiceConnection mConnection = new ServiceConnection() {
 
         @Override
         public void onServiceConnected(ComponentName className,
@@ -124,6 +127,6 @@ public class RegFenceActivity extends AppCompatActivity {
             Log.d(TAG, "onServiceDisconnected().................................");
         }
 
-    };*/
+    };
 }
 

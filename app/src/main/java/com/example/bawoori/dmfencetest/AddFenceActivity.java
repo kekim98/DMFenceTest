@@ -9,6 +9,7 @@ import android.os.IBinder;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.bawoori.dmlib.DMInfo;
 import com.bawoori.dmlib.DMService;
@@ -85,6 +86,12 @@ public class AddFenceActivity extends AppCompatActivity {
                     DMTestApplication application = (DMTestApplication)getApplicationContext();
                     Double latitude = application.getLatitude();
                     Double longitue = application.getLongitude();
+
+                    if (latitude == 0.0f || longitue == 0.0f) {
+                        Toast.makeText(application, "GPS 값이 유효하지 않습니다. GPS 상태 확인 바랍니다", Toast.LENGTH_SHORT).show();
+                        finish();
+                        return;
+                    }
 
                     dmInfo.setId(geofence_id);
                     dmInfo.setLatitude(latitude);

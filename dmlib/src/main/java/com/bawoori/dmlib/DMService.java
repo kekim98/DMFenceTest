@@ -50,15 +50,17 @@ public class DMService extends Service implements OnCompleteListener<Void> {
     public void onComplete(@NonNull Task<Void> task) {
   //      mPendingGeofenceTask = PendingGeofenceTask.NONE;
         if (task.isSuccessful()) {
+            /*
             updateGeofencesAdded(!getGeofencesAdded());
 
-           /* int messageId = getGeofencesAdded() ? R.string.geofences_added :
+            int messageId = getGeofencesAdded() ? R.string.geofences_added :
                     R.string.geofences_removed;*/
-            int messageId = R.string.geofences_added;
-            Toast.makeText(this, getString(messageId), Toast.LENGTH_SHORT).show();
+          //int messageId = R.string.geofences_added;
+           //oast.makeText(this, getString(messageId), Toast.LENGTH_SHORT).show();
         } else {
             // Get the status code for the error and log it using a user-friendly message.
             String errorMessage = GeofenceErrorMessages.getErrorString(this, task.getException());
+            Toast.makeText(this, errorMessage, Toast.LENGTH_SHORT).show();
             Log.w(TAG, errorMessage);
         }
 
@@ -73,12 +75,19 @@ public class DMService extends Service implements OnCompleteListener<Void> {
     }
 
     @Override
-    public IBinder onBind(Intent intent) {
+    public void onCreate() {
+        super.onCreate();
+
+        mGeofencePendingIntent = null;
         mGeofenceStorage = new SimpleGeofenceStore(this);
         mGeofenceList = new ArrayList<>();
         mGeofencingClient = LocationServices.getGeofencingClient(this);
+        createGeofences();
+   }
 
-        return mBinder;
+    @Override
+    public IBinder onBind(Intent intent) {
+         return mBinder;
     }
 
     private void updateGeofencesAdded(boolean added) {
@@ -105,29 +114,25 @@ public class DMService extends Service implements OnCompleteListener<Void> {
     }
 
     public void createGeofences() {
-        /*// Create internal "flattened" objects containing the geofence data.
-        mAndroidBuildingGeofence = new SimpleGeofence(
-                ANDROID_BUILDING_ID,                // geofenceId.
-                ANDROID_BUILDING_LATITUDE,
-                ANDROID_BUILDING_LONGITUDE,
-                ANDROID_BUILDING_RADIUS_METERS,
-                GEOFENCE_EXPIRATION_TIME,
-                Geofence.GEOFENCE_TRANSITION_ENTER | Geofence.GEOFENCE_TRANSITION_EXIT
-        );
-        mYerbaBuenaGeofence = new SimpleGeofence(
-                YERBA_BUENA_ID,                // geofenceId.
-                YERBA_BUENA_LATITUDE,
-                YERBA_BUENA_LONGITUDE,
-                YERBA_BUENA_RADIUS_METERS,
-                GEOFENCE_EXPIRATION_TIME,
-                Geofence.GEOFENCE_TRANSITION_ENTER | Geofence.GEOFENCE_TRANSITION_EXIT
-        );
 
-        // Store these flat versions in SharedPreferences and add them to the geofence list.
-        mGeofenceStorage.setGeofence(ANDROID_BUILDING_ID, mAndroidBuildingGeofence);
-        mGeofenceStorage.setGeofence(YERBA_BUENA_ID, mYerbaBuenaGeofence);
-        mGeofenceList.add(mAndroidBuildingGeofence.toGeofence());
-        mGeofenceList.add(mYerbaBuenaGeofence.toGeofence());*/
+        removeGeofences();
+
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        mGeofenceList.clear();
+        for (String id : getAllFences()) {
+            SimpleGeofence geofence = mGeofenceStorage.getGeofence(id);
+            mGeofenceList.add(geofence.toGeofence());
+        }
+
+        if (mGeofenceList.size() > 0) {
+            addGeofences();
+        }
+
     }
 
     private PendingIntent getGeofencePendingIntent() {
@@ -179,7 +184,6 @@ public class DMService extends Service implements OnCompleteListener<Void> {
 
     public boolean addFence(DMInfo info) {
 
-      //  removeGeofences();
 
         String id = info.getId();
         Double latitude = info.getLatitude();
@@ -191,9 +195,8 @@ public class DMService extends Service implements OnCompleteListener<Void> {
                 Geofence.GEOFENCE_TRANSITION_ENTER | Geofence.GEOFENCE_TRANSITION_EXIT);
 
         mGeofenceStorage.setGeofence(id, geofence);
-        mGeofenceList.add(geofence.toGeofence());
 
-        addGeofences();
+        createGeofences();
 
         return true;
     }
