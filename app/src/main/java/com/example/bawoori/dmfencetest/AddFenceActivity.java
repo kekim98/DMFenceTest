@@ -24,7 +24,7 @@ public class AddFenceActivity extends AppCompatActivity {
     private static final String ADD_FAIL_MSG = "이미 등록된 Geofences가 있습니다.";
 
     DMService mService;
-    boolean mBound = false;
+    boolean mBound;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,6 +33,7 @@ public class AddFenceActivity extends AppCompatActivity {
         setTitle("등록 결과 화면");
 
         // Bind to DMService
+        mBound=false;
         Intent intent = new Intent(this, DMService.class);
         bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
     }
@@ -81,9 +82,9 @@ public class AddFenceActivity extends AppCompatActivity {
                 DMInfo dmInfo = new DMInfo();
                 
                 String geofence_id="";
-                if(extras != null){
+                if(extras != null) {
                     geofence_id = extras.getString("FENCE_ID");
-                    DMTestApplication application = (DMTestApplication)getApplicationContext();
+                    DMTestApplication application = (DMTestApplication) getApplicationContext();
                     Double latitude = application.getLatitude();
                     Double longitue = application.getLongitude();
 
@@ -99,14 +100,14 @@ public class AddFenceActivity extends AppCompatActivity {
 
                     Log.d(TAG, "onServiceConnected: latitude=" + String.valueOf(latitude));
                     result = mService.addFence(dmInfo);
-                }
 
-                if(result){
-                    TextView textView1 = (TextView) findViewById(R.id.addResultMsg) ;
-                    textView1.setText(ADD_SUCCESS_MSG) ;
 
-                    TextView id = (TextView) findViewById(R.id.VID);
-                    id.setText(geofence_id);
+                    if (result) {
+                        TextView textView1 = (TextView) findViewById(R.id.addResultMsg);
+                        textView1.setText(ADD_SUCCESS_MSG);
+
+                        TextView id = (TextView) findViewById(R.id.VID);
+                        id.setText(geofence_id);
 
                    /* TextView CELLID = (TextView) findViewById(R.id.VCELLID);
                     CELLID.setText(lo.getCID());
@@ -117,16 +118,17 @@ public class AddFenceActivity extends AppCompatActivity {
                     TextView ADDR2 = (TextView) findViewById(R.id.VADDR2);
                     ADDR2.setText(lo.getADDR2());*/
 
-                    TextView LAT = (TextView) findViewById(R.id.VLAT);
-                    LAT.setText(String.format(Locale.ENGLISH, "%f", dmInfo.getLatitude()));
+                        TextView LAT = (TextView) findViewById(R.id.VLAT);
+                        LAT.setText(String.format(Locale.ENGLISH, "%f", dmInfo.getLatitude()));
 
-                    TextView LNG = (TextView) findViewById(R.id.VLNG);
-                    LNG.setText(String.format(Locale.ENGLISH, "%f", dmInfo.getLongitude()));
+                        TextView LNG = (TextView) findViewById(R.id.VLNG);
+                        LNG.setText(String.format(Locale.ENGLISH, "%f", dmInfo.getLongitude()));
 
 
-                }else{
-                    TextView textView1 = (TextView) findViewById(R.id.addResultMsg) ;
-                    textView1.setText(ADD_FAIL_MSG) ;
+                    } else {
+                        TextView textView1 = (TextView) findViewById(R.id.addResultMsg);
+                        textView1.setText(ADD_FAIL_MSG);
+                    }
                 }
                 Log.d(TAG, "ServiceConnected.................................");
             }

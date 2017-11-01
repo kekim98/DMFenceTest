@@ -62,8 +62,8 @@ public class FenceInfoActivity extends AppCompatActivity {
         }
 
     }
-    /** Called when a button is clicked (the button in the layout file attaches to
-     * this method with the android:onClick attribute) */
+ /*   *//** Called when a button is clicked (the button in the layout file attaches to
+     * this method with the android:onClick attribute) *//*
     public void onReAddDevice(View v) {
         Log.d(TAG, "FENCE_ID:" + FENCE_ID);
         Intent intent=new Intent(this, AddFenceActivity.class);
@@ -71,7 +71,7 @@ public class FenceInfoActivity extends AppCompatActivity {
         startActivity(intent);
         finish();
     }
-
+*/
     public void onCancle(View v) {
         finish();
     }
