@@ -26,6 +26,16 @@ import static com.bawoori.dmlib.Constants.GEOFENCE_EXPIRATION_TIME;
 public class DMService extends Service implements OnCompleteListener<Void> {
     private static final String TAG = DMService.class.getSimpleName();
 
+    private static  Class<?> targetActivityClass = null;
+
+    public static Class<?> getTargetActivityClass() {
+        return targetActivityClass;
+    }
+
+    public static void setTargetActivityClass(Class<?> target) {
+        targetActivityClass = target;
+    }
+
     private enum PendingGeofenceTask {
         ADD, REMOVE, NONE
     }
@@ -148,7 +158,8 @@ public class DMService extends Service implements OnCompleteListener<Void> {
 
 
 
-    public void initDMLib() {
+    public void initDMLib(Class<?> target) {
+        setTargetActivityClass(target);
         /*mGeofencingClient = LocationServices.getGeofencingClient(this);
         mGeofenceStorage = new SimpleGeofenceStore(this);
         mGeofenceList = new ArrayList<>();*/
@@ -194,7 +205,7 @@ public class DMService extends Service implements OnCompleteListener<Void> {
 
         result.setId(geofence.getId());
         result.setLatitude(geofence.getLatitude());
-        result.setLongitude(geofence.getLatitude());
+        result.setLongitude(geofence.getLongitude());
         result.setRadius(geofence.getRadius());
         result.setType(geofence.getTransitionType());
 

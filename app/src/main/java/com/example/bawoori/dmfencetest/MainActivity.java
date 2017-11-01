@@ -109,7 +109,7 @@ public class MainActivity extends AppCompatActivity {
                mService = binder.getService();
                mBound = true;
 
-               mService.initDMLib();
+               mService.initDMLib(MainActivity.this.getClass());
                refresh();
                Log.d(TAG, "ServiceConnected-mBound:" + mBound);
            }

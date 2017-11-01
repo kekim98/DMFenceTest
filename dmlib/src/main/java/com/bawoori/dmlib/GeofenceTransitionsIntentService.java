@@ -22,6 +22,8 @@ import android.app.PendingIntent;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
+import android.content.pm.PackageManager;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.support.v4.app.NotificationCompat;
@@ -123,12 +125,23 @@ public class GeofenceTransitionsIntentService extends IntentService {
     private void sendNotification(String notificationDetails) {
 
 
-        ComponentName cn = new ComponentName("com.example.bawoori.dmfencetest",
+        /*ComponentName cn = new ComponentName("com.example.bawoori.dmfencetest",
                 "com.example.bawoori.dmfencetest.MainActivity");
+*/
+       // Class<?> act = Class.forName("com.example.bawoori.dmfencetest.MainActivity");
+        //ActivityInfo aInfo = null;
+        Class<?> receiveClass = DMService.getTargetActivityClass();
+       /* try {
+            aInfo= this.getPackageManager().getActivityInfo(cn,0);
+            receiveClass = aInfo.getClass();
+        } catch (PackageManager.NameNotFoundException e) {
+            e.printStackTrace();
+        }*/
+
 
         // Create an explicit content Intent that starts the main Activity.
         //Intent notificationIntent = new Intent(getApplicationContext(), MainActivity.class);
-        Intent notificationIntent = new Intent(getApplicationContext(), cn.getClass());
+        Intent notificationIntent = new Intent(getApplicationContext(), receiveClass);
        /* Intent notificationIntent = new Intent();
         notificationIntent.setClassName(getApplicationContext(), "com.example.bawoori.dmfencetest.MainActivity");*/
 
@@ -137,7 +150,7 @@ public class GeofenceTransitionsIntentService extends IntentService {
 
         // Add the main Activity to the task stack as the parent.
        // stackBuilder.addParentStack(MainActivity.class);
-        stackBuilder.addParentStack(cn.getClass());
+        stackBuilder.addParentStack(receiveClass);
 
         // Push the content Intent onto the stack.
         stackBuilder.addNextIntent(notificationIntent);
