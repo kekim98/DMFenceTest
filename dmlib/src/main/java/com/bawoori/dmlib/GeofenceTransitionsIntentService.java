@@ -48,6 +48,15 @@ public class GeofenceTransitionsIntentService extends IntentService {
 
     private static final String TAG = "GeofenceTransitionsIS";
 
+    private static  Class<?> targetActivityClass = null;
+
+    public static Class<?> getTargetActivityClass() {
+        return targetActivityClass;
+    }
+
+    public static void setTargetActivityClass(Class<?> target) {
+        targetActivityClass = target;
+    }
     /**
      * This constructor is required, and calls the super IntentService(String)
      * constructor with the name for a worker thread.
@@ -130,7 +139,7 @@ public class GeofenceTransitionsIntentService extends IntentService {
 */
        // Class<?> act = Class.forName("com.example.bawoori.dmfencetest.MainActivity");
         //ActivityInfo aInfo = null;
-        Class<?> receiveClass = DMService.getTargetActivityClass();
+        Class<?> receiveClass = GeofenceTransitionsIntentService.getTargetActivityClass();
        /* try {
             aInfo= this.getPackageManager().getActivityInfo(cn,0);
             receiveClass = aInfo.getClass();
@@ -144,7 +153,9 @@ public class GeofenceTransitionsIntentService extends IntentService {
         Intent notificationIntent = new Intent(getApplicationContext(), receiveClass);
        /* Intent notificationIntent = new Intent();
         notificationIntent.setClassName(getApplicationContext(), "com.example.bawoori.dmfencetest.MainActivity");*/
-
+       /* Intent notificationIntent = new Intent()
+                .setAction("com.bawoori.dmlib.action.RECEVIVE_INTENT")
+                .setFlags(Intent.FLAG_INCLUDE_STOPPED_PACKAGES | Intent.FLAG_ACTIVITY_NEW_TASK);*/
         // Construct a task stack.
         TaskStackBuilder stackBuilder = TaskStackBuilder.create(this);
 

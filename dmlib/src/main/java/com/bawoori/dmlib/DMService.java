@@ -2,10 +2,13 @@ package com.bawoori.dmlib;
 
 import android.app.PendingIntent;
 import android.app.Service;
+import android.content.Context;
 import android.content.Intent;
+import android.net.wifi.WifiManager;
 import android.os.Binder;
 import android.os.IBinder;
 import android.preference.PreferenceManager;
+import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.util.Log;
 import android.widget.Toast;
@@ -26,15 +29,7 @@ import static com.bawoori.dmlib.Constants.GEOFENCE_EXPIRATION_TIME;
 public class DMService extends Service implements OnCompleteListener<Void> {
     private static final String TAG = DMService.class.getSimpleName();
 
-    private static  Class<?> targetActivityClass = null;
 
-    public static Class<?> getTargetActivityClass() {
-        return targetActivityClass;
-    }
-
-    public static void setTargetActivityClass(Class<?> target) {
-        targetActivityClass = target;
-    }
 
     private enum PendingGeofenceTask {
         ADD, REMOVE, NONE
@@ -78,12 +73,28 @@ public class DMService extends Service implements OnCompleteListener<Void> {
     public void onCreate() {
         super.onCreate();
 
+        Settings.System.putInt(getContentResolver(),
+                Settings.System.WIFI_SLEEP_POLICY,
+                Settings.System.WIFI_SLEEP_POLICY_NEVER);
+
+        WifiManager wm = (WifiManager) this.getSystemService(Context.WIFI_SERVICE);
+        WifiManager.WifiLock wifiLock = wm.createWifiLock(WifiManager.WIFI_MODE_SCAN_ONLY , "MyWifiLock");
+        if(!wifiLock.isHeld()){
+            wifiLock.acquire();
+        }
+
         mGeofencePendingIntent = null;
         mGeofenceStorage = new SimpleGeofenceStore(this);
         mGeofenceList = new ArrayList<>();
         mGeofencingClient = LocationServices.getGeofencingClient(this);
         createGeofences();
    }
+
+    @Override
+    public int onStartCommand(Intent intent, int flags, int startId) {
+        super.onStartCommand(intent, flags, startId);
+        return START_STICKY;
+    }
 
     @Override
     public IBinder onBind(Intent intent) {
@@ -114,14 +125,13 @@ public class DMService extends Service implements OnCompleteListener<Void> {
     }
 
     public void createGeofences() {
-
         removeGeofences();
 
-        try {
+       /* try {
             Thread.sleep(1000);
         } catch (InterruptedException e) {
             e.printStackTrace();
-        }
+        }*/
 
         mGeofenceList.clear();
         for (String id : getAllFences()) {
@@ -164,7 +174,7 @@ public class DMService extends Service implements OnCompleteListener<Void> {
 
 
     public void initDMLib(Class<?> target) {
-        setTargetActivityClass(target);
+        GeofenceTransitionsIntentService.setTargetActivityClass(target);
         /*mGeofencingClient = LocationServices.getGeofencingClient(this);
         mGeofenceStorage = new SimpleGeofenceStore(this);
         mGeofenceList = new ArrayList<>();*/

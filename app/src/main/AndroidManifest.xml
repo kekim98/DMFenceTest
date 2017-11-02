@@ -17,6 +17,8 @@
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
+            <!--    <action android:name="com.bawoori.dmlib.action.RECEVIVE_INTENT" />
+-->
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
