@@ -4,6 +4,8 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.net.wifi.WifiManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.support.v7.app.AppCompatActivity;
@@ -66,11 +68,22 @@ public class MainActivity extends AppCompatActivity {
 //        bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
     }
 
+    private static final int REQUEST_SCAN_ALWAYS_AVAILABLE = 1;
     @Override
     protected void onResume() {
         super.onResume();
         refresh();
         Log.d(TAG, "onResume().mBound:" + mBound);
+
+
+
+        WifiManager wifiManager = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
+
+        if (Build.VERSION.SDK_INT >= 18 && !wifiManager.isScanAlwaysAvailable()) {
+            Intent intent = new Intent();
+            intent.setAction(WifiManager.ACTION_REQUEST_SCAN_ALWAYS_AVAILABLE);
+            startActivityForResult(intent, REQUEST_SCAN_ALWAYS_AVAILABLE);
+        }
     }
 
     @Override
@@ -109,7 +122,7 @@ public class MainActivity extends AppCompatActivity {
                mService = binder.getService();
                mBound = true;
 
-               mService.initDMLib(MainActivity.this.getClass());
+               mService.initDMLib();
                refresh();
                Log.d(TAG, "ServiceConnected-mBound:" + mBound);
            }

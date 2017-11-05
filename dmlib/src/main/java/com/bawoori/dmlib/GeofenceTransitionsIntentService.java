@@ -19,15 +19,11 @@ package com.bawoori.dmlib;
 import android.app.IntentService;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
-import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.ActivityInfo;
-import android.content.pm.PackageManager;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.support.v4.app.NotificationCompat;
-import android.support.v4.app.TaskStackBuilder;
 import android.text.TextUtils;
 import android.util.Log;
 
@@ -48,15 +44,6 @@ public class GeofenceTransitionsIntentService extends IntentService {
 
     private static final String TAG = "GeofenceTransitionsIS";
 
-    private static  Class<?> targetActivityClass = null;
-
-    public static Class<?> getTargetActivityClass() {
-        return targetActivityClass;
-    }
-
-    public static void setTargetActivityClass(Class<?> target) {
-        targetActivityClass = target;
-    }
     /**
      * This constructor is required, and calls the super IntentService(String)
      * constructor with the name for a worker thread.
@@ -133,42 +120,22 @@ public class GeofenceTransitionsIntentService extends IntentService {
      */
     private void sendNotification(String notificationDetails) {
 
+        // Creates an Intent for the Activity
+        Intent notificationIntent = new Intent();
 
-        /*ComponentName cn = new ComponentName("com.example.bawoori.dmfencetest",
-                "com.example.bawoori.dmfencetest.MainActivity");
-*/
-       // Class<?> act = Class.forName("com.example.bawoori.dmfencetest.MainActivity");
-        //ActivityInfo aInfo = null;
-        Class<?> receiveClass = GeofenceTransitionsIntentService.getTargetActivityClass();
-       /* try {
-            aInfo= this.getPackageManager().getActivityInfo(cn,0);
-            receiveClass = aInfo.getClass();
-        } catch (PackageManager.NameNotFoundException e) {
-            e.printStackTrace();
-        }*/
+        notificationIntent.setAction("com.bawoori.dmlib.ACTION_RECEVIVE_INTENT");
 
-
-        // Create an explicit content Intent that starts the main Activity.
-        //Intent notificationIntent = new Intent(getApplicationContext(), MainActivity.class);
-        Intent notificationIntent = new Intent(getApplicationContext(), receiveClass);
-       /* Intent notificationIntent = new Intent();
-        notificationIntent.setClassName(getApplicationContext(), "com.example.bawoori.dmfencetest.MainActivity");*/
-       /* Intent notificationIntent = new Intent()
-                .setAction("com.bawoori.dmlib.action.RECEVIVE_INTENT")
-                .setFlags(Intent.FLAG_INCLUDE_STOPPED_PACKAGES | Intent.FLAG_ACTIVITY_NEW_TASK);*/
-        // Construct a task stack.
-        TaskStackBuilder stackBuilder = TaskStackBuilder.create(this);
-
-        // Add the main Activity to the task stack as the parent.
-       // stackBuilder.addParentStack(MainActivity.class);
-        stackBuilder.addParentStack(receiveClass);
-
-        // Push the content Intent onto the stack.
-        stackBuilder.addNextIntent(notificationIntent);
-
-        // Get a PendingIntent containing the entire back stack.
+// Sets the Activity to start in a new, empty task
+        notificationIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK |
+                Intent.FLAG_ACTIVITY_CLEAR_TASK);
+// Creates the PendingIntent
         PendingIntent notificationPendingIntent =
-                stackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);
+                PendingIntent.getActivity(
+                        this,
+                        0,
+                        notificationIntent,
+                        PendingIntent.FLAG_UPDATE_CURRENT
+                );
 
         // Get a notification builder that's compatible with platform versions >= 4
         NotificationCompat.Builder builder = new NotificationCompat.Builder(this);
